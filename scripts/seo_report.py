@@ -133,19 +133,69 @@ def _json_to_markdown(data: dict, source: str) -> str:
                 lines.append(f"| {score} | {status} | {wc} | {n} | {url} |")
         lines.append("")
 
-        # Worst pages detail
-        worst = [r for r in results if (r.get("score") or 0) < 60][:15]
-        if worst:
-            lines.append("## Critical Pages (Score < 60)")
+        # Detailed per-URL analysis (always shown)
+        lines.append("## Detailed Analysis Per URL")
+        lines.append("")
+
+        for r in results:
+            url = r.get("url", "")
+            score = r.get("score", "?")
+            seo = r.get("seo") or {}
+            content = r.get("content") or {}
+            geo = r.get("geo") or {}
+            issues = r.get("issues", [])
+
+            lines.append(f"### {url}")
+            lines.append(f"**Score: {score}/100**")
             lines.append("")
-            for r in worst:
-                lines.append(f"### {r.get('url', '')}")
-                lines.append(f"**Score:** {r.get('score', '?')}/100")
+
+            # SEO overview
+            lines.append("**On-Page SEO:**")
+            lines.append(f"- **Title:** {seo.get('title', 'N/A')} ({seo.get('title_length', 0)} chars)")
+            lines.append(f"- **Meta Description:** {(seo.get('meta_description') or 'N/A')[:80]}... ({seo.get('meta_description_length', 0)} chars)")
+            lines.append(f"- **H1:** {', '.join(seo.get('h1', [])) or 'N/A'}")
+            lines.append(f"- **Word Count:** {seo.get('word_count', 0)}")
+            lines.append(f"- **Headings:** {seo.get('h1_count', 0)} H1, {seo.get('h2_count', 0)} H2, {seo.get('h3_count', 0)} H3")
+            lines.append(f"- **Links:** {seo.get('internal_links', 0)} internal, {seo.get('external_links', 0)} external")
+            lines.append(f"- **Images:** {seo.get('images_total', 0)} total, {seo.get('images_missing_alt', 0)} missing alt")
+            lines.append(f"- **Schema:** {', '.join(seo.get('schema_types', [])) or 'None'}")
+            lines.append(f"- **Canonical:** {seo.get('canonical', 'N/A')}")
+            lines.append(f"- **OG Tags:** {'Yes' if seo.get('has_og') else 'No'} | **Twitter Card:** {'Yes' if seo.get('has_twitter_card') else 'No'}")
+            lines.append("")
+
+            # Content data (if available)
+            if content:
+                lines.append("**Content Quality (E-E-A-T):**")
+                lines.append(f"- **Readability:** {content.get('readability_score', 0)} ({content.get('reading_level', 'N/A')})")
+                lines.append(f"- **Author:** {content.get('author_name') or ('Present' if content.get('has_author') else 'Missing')}")
+                lines.append(f"- **Publish Date:** {'Yes' if content.get('has_publish_date') else 'No'} | **Updated Date:** {'Yes' if content.get('has_update_date') else 'No'}")
+                lines.append(f"- **External Citations:** {content.get('external_citation_count', 0)}")
+                lines.append(f"- **Content-to-HTML Ratio:** {content.get('content_to_html_ratio', 0)}%")
+                lines.append(f"- **Paragraphs:** {content.get('paragraph_count', 0)} | **Lists:** {content.get('list_count', 0)} | **Tables:** {content.get('table_count', 0)}")
                 lines.append("")
-                for issue in r.get("issues", []):
+
+            # GEO data (if available)
+            if geo:
+                lines.append("**AI Citation Readiness (GEO):**")
+                lines.append(f"- **Citability Score:** {geo.get('citability_score', 0)}/100")
+                lines.append(f"- **Answer-First:** {'Yes' if geo.get('has_answer_first') else 'No'}")
+                lines.append(f"- **Q&A Pairs:** {geo.get('qa_pairs_count', 0)}")
+                lines.append(f"- **Entity Clarity:** {geo.get('entity_clarity', 'N/A')}")
+                lines.append(f"- **Citable Passages:** {geo.get('citable_passages', 0)} / {geo.get('passage_count', 0)}")
+                lines.append(f"- **Stats/Data Points:** {geo.get('stat_claims_count', 0)}")
+                lines.append(f"- **Structured Lists:** {'Yes' if geo.get('has_structured_lists') else 'No'} | **Comparison Table:** {'Yes' if geo.get('has_comparison_table') else 'No'}")
+                lines.append("")
+
+            # Issues
+            if issues:
+                lines.append("**Issues Found:**")
+                for issue in issues:
                     sev = issue["severity"].upper()
                     itype = issue.get("type", "page").upper()
                     lines.append(f"- **[{sev}:{itype}]** {issue['issue']}")
+                lines.append("")
+            else:
+                lines.append("**No issues found.**")
                 lines.append("")
 
     # Google API data (psi, gsc, inspection)

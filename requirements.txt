@@ -1,6 +1,6 @@
 # Claude SEO - Python Dependencies
 # Bounded version pinning with security-conscious minimums
-# Last updated: February 7, 2026
+# Last updated: April 14, 2026
 
 beautifulsoup4>=4.12.0,<5.0.0     # No known CVEs
 requests>=2.32.4,<3.0.0           # CVE-2024-47081, CVE-2024-35195 fixes
@@ -10,10 +10,11 @@ Pillow>=12.1.0,<13.0.0            # CVE-2025-48379 fix
 urllib3>=2.6.3,<3.0.0             # CRITICAL: CVE-2026-21441 (CVSS 8.9), CVE-2025-66418
 validators>=0.22.0,<1.0.0         # No known CVEs
 
-# Report generation (for seo-google PDF/Excel reports)
-matplotlib>=3.8.0,<4.0.0              # No known CVEs
-weasyprint>=61.0,<70.0                # No known CVEs
+# Report generation (PDF/DOCX/XLSX/HTML)
+matplotlib>=3.8.0,<4.0.0              # No known CVEs (charts)
+weasyprint>=61.0,<70.0                # No known CVEs (HTML-to-PDF)
 openpyxl>=3.1.0,<4.0.0                # No known CVEs (Excel export)
+python-docx>=1.1.0,<2.0.0             # No known CVEs (Word DOCX export)
 
 # Google API dependencies (for seo-google skill)
 google-api-python-client>=2.100.0,<3.0.0   # No known CVEs

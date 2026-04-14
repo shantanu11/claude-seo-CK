@@ -696,16 +696,16 @@ def print_summary(output: dict):
     # Header based on mode
     if mode == "geo":
         print(f"{'Score':>5}  {'Cite':>5}  {'Words':>6}  {'Issues':>6}  URL")
-        print(f"{'─'*5}  {'─'*5}  {'─'*6}  {'─'*6}  {'─'*50}")
+        print(f"{'-'*5}  {'-'*5}  {'-'*6}  {'-'*6}  {'-'*50}")
     elif mode == "content":
         print(f"{'Score':>5}  {'Read':>5}  {'Words':>6}  {'Issues':>6}  URL")
-        print(f"{'─'*5}  {'─'*5}  {'─'*6}  {'─'*6}  {'─'*50}")
+        print(f"{'-'*5}  {'-'*5}  {'-'*6}  {'-'*6}  {'-'*50}")
     elif mode == "all":
         print(f"{'Score':>5}  {'Read':>5}  {'Cite':>5}  {'Words':>6}  {'Issues':>6}  URL")
-        print(f"{'─'*5}  {'─'*5}  {'─'*5}  {'─'*6}  {'─'*6}  {'─'*50}")
+        print(f"{'-'*5}  {'-'*5}  {'-'*5}  {'-'*6}  {'-'*6}  {'-'*50}")
     else:
         print(f"{'Score':>5}  {'Status':>6}  {'Words':>6}  {'Issues':>6}  URL")
-        print(f"{'─'*5}  {'─'*6}  {'─'*6}  {'─'*6}  {'─'*50}")
+        print(f"{'-'*5}  {'-'*6}  {'-'*6}  {'-'*6}  {'-'*50}")
 
     results = output.get("results", [])
     sorted_results = sorted(results, key=lambda r: r.get("score") or 0)
