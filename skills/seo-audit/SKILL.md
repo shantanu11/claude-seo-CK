@@ -189,7 +189,55 @@ Break into 4 phases with numbered tasks, fix references, time estimates, and imp
 
 **Score Projection:** Current: XX/100 -> Day 10: XX/100 -> Day 30: XX/100
 
-### 10. Footer
+### 10. Security Headers Detail
+
+| Header | Found | Recommended | Status |
+|--------|-------|-------------|--------|
+| Strict-Transport-Security | {value or MISSING} | max-age=31536000; includeSubDomains | ... |
+| Content-Security-Policy | {value or MISSING} | {appropriate CSP} | ... |
+| X-Content-Type-Options | {value or MISSING} | nosniff | ... |
+| X-Frame-Options | {value or MISSING} | DENY or SAMEORIGIN | ... |
+| Referrer-Policy | {value or MISSING} | strict-origin-when-cross-origin | ... |
+| Permissions-Policy | {value or MISSING} | camera=(), microphone=(), geolocation=() | ... |
+
+### 11. Schema Validation Detail
+
+For every JSON-LD block found on the site, validate:
+
+| Page | Schema Type | Status | Issues |
+|------|------------|--------|--------|
+| Homepage | Organization | Valid / Errors | {list specific field errors with actual vs expected values} |
+| Homepage | WebSite | Valid / Errors | ... |
+| Product pages | Product | Valid / Errors | {brand wrong? missing sku? missing aggregateRating?} |
+| Blog posts | BlogPosting | Valid / Errors | ... |
+
+Include the exact wrong values found and what they should be.
+
+### 12. Third-Party Script Inventory
+
+| Script | Est. Size | Load Point | Impact | Recommendation |
+|--------|----------|------------|--------|---------------|
+| {script name} | ~XXkB | head sync / body async / deferred | LCP/INP/CLS | Keep/Defer/Remove |
+
+### 13. Internal Linking Analysis
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| Avg internal links per page | {X} | Good (>5) / Low / Very Low |
+| Orphan pages (0 incoming links) | {count} | List sample URLs |
+| Most linked pages | {top 5 with counts} | |
+| Pages with no outgoing links | {count} | Dead ends |
+
+### 14. Mobile Usability Signals
+
+| Signal | Found | Assessment |
+|--------|-------|------------|
+| Viewport meta tag | {present/missing} | PASS / MISSING |
+| Font sizes | {min size found} | PASS / Too small (<14px) |
+| Tap targets | {assessment from HTML} | Adequate spacing / Too close |
+| Horizontal scroll | {assessment} | PASS / Content overflows |
+
+### 15. Footer
 
 ```
 This report was generated using Claude SEO audit methodology. All findings were
