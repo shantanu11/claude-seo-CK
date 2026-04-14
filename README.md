@@ -87,6 +87,8 @@ claude
 | `/seo google [command] [url]` | Google SEO APIs (GSC, PageSpeed, CrUX, Indexing, GA4) |
 | `/seo google report [type]` | Generate PDF/DOCX/XLSX report with charts (cwv-audit, gsc-performance, indexation, full) |
 | `/seo google inspect-urls <urls>` | Batch URL Inspection from comma-separated list (50+ URLs, concurrent workers) |
+| `/seo page-batch <urls or file>` | Batch page/content/geo analysis for 50+ URLs with concurrent workers |
+| `/seo report --input <file>` | Convert any analysis output (md/json) to shareable DOCX/PDF |
 | `/seo backlinks <url>` | Backlink profile analysis (free: Moz, Bing, Common Crawl) |
 | `/seo firecrawl [command] <url>` | Full-site crawling and site mapping (extension) |
 | `/seo dataforseo [command]` | Live SEO data via DataForSEO (extension) |
@@ -225,31 +227,69 @@ Generate professional reports after any analysis:
 | **XLSX** | Excel workbook with filterable data sheets | `openpyxl` |
 | **HTML** | Standalone HTML file | (built-in) |
 
-### Batch URL Inspection (50+ URLs)
+### Batch Page/Content/GEO Analysis (50+ URLs)
 
-Inspect large URL lists with concurrent workers and progress tracking:
+Analyze multiple pages at once with four modes:
 
 ```bash
-# From file
-/seo google inspect-batch urls.txt --workers 5
+# On-page SEO (title, meta, headings, links, schema)
+/seo page-batch --urls "url1,url2,url3..." --mode page
 
-# Direct URL list (no file needed)
-/seo google inspect-urls "https://a.com/1,https://a.com/2,..."
+# Content / E-E-A-T (readability, author, dates, citations)
+/seo page-batch --batch urls.txt --mode content --workers 5
 
-# With incremental save (crash recovery for large batches)
-python scripts/gsc_inspect.py --batch urls.txt --workers 5 --save results.json --json
+# GEO / AI citation readiness (citability, Q&A, answer-first)
+/seo page-batch --batch urls.txt --mode geo --workers 5
+
+# Everything combined
+/seo page-batch --batch urls.txt --mode all --workers 5
 ```
 
-Features: shared service object (no per-URL rebuild), 1-10 concurrent workers, progress with ETA, incremental JSON save every 10 URLs. Limit: 2,000 URLs/day per site.
+Auto-saves results with domain-based filename and prints the exact report command:
+
+```
+Results saved to: seo-batch-cashkaro.com-all-20260414-1545.json
+Generate DOCX report: /seo report --input seo-batch-cashkaro.com-all-20260414-1545.json --format docx
+```
+
+### Batch URL Inspection (50+ URLs)
+
+Inspect indexation status for large URL lists:
+
+```bash
+/seo google inspect-batch urls.txt --workers 5
+/seo google inspect-urls "https://a.com/1,https://a.com/2,..."
+```
+
+Features: shared service object, 1-10 concurrent workers, progress with ETA, incremental JSON save. Limit: 2,000 URLs/day per site.
+
+### Universal Report Generator
+
+Convert any analysis output to a shareable DOCX or PDF -- no re-analysis needed:
+
+```bash
+# From batch analysis JSON
+/seo report --input seo-batch-cashkaro.com-all-20260414-1545.json --format docx
+
+# From audit markdown
+/seo report --input FULL-AUDIT-REPORT.md --input ACTION-PLAN.md --format docx
+
+# Auto-find all reports in current directory
+/seo report --dir ./ --format both
+```
+
+Accepts: `.md` reports from any `/seo` command, `.json` from `page-batch` or Google APIs.
+Outputs: Professional DOCX (branded tables, headings) or PDF (styled HTML).
 
 ### Recently Added
+- **Batch page/content/geo analysis** -- `/seo page-batch` with `--mode page|content|geo|all` for 50+ URLs
+- **Universal report generator** -- `/seo report` converts any analysis output to shareable DOCX/PDF
 - **DOCX report format** -- Word document output for all report types (`--format docx`)
-- **Batch URL Inspection enhancements** -- `--urls` direct input, `--workers` concurrency, progress tracking, `--save` incremental output
+- **Batch URL Inspection enhancements** -- `--urls` direct input, `--workers` concurrency, progress tracking
 - Programmatic SEO skill (`/seo programmatic`)
 - Competitor comparison pages skill (`/seo competitor-pages`)
 - Multi-language hreflang validation (`/seo hreflang`)
 - Video & Live schema types (VideoObject, BroadcastEvent, Clip, SeekToAction)
-- Google SEO quick-reference guide
 
 ## Requirements
 

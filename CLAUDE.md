@@ -82,6 +82,8 @@ claude-seo/
     parse_html.py                # HTML parser for SEO elements
     capture_screenshot.py        # Playwright screenshots
     analyze_visual.py            # Visual analysis helper
+    page_batch.py                # Batch page/content/geo analysis (50+ URLs, 4 modes)
+    seo_report.py                # Universal report generator (md/json → DOCX/PDF)
     mobile_analysis.py           # Mobile rendering analysis (gitignored, dev-only)
   schema/                          # Schema.org JSON-LD templates
   extensions/                      # Optional add-on install helpers
