@@ -186,14 +186,28 @@ def _json_to_markdown(data: dict, source: str) -> str:
                 lines.append(f"- **Structured Lists:** {'Yes' if geo.get('has_structured_lists') else 'No'} | **Comparison Table:** {'Yes' if geo.get('has_comparison_table') else 'No'}")
                 lines.append("")
 
-            # Issues
+            # Issues with evidence and verify links
             if issues:
-                lines.append("**Issues Found:**")
-                for issue in issues:
-                    sev = issue["severity"].upper()
-                    itype = issue.get("type", "page").upper()
-                    lines.append(f"- **[{sev}:{itype}]** {issue['issue']}")
-                lines.append("")
+                # Group by severity
+                for sev_level in ["critical", "high", "medium", "low"]:
+                    sev_issues = [i for i in issues if i.get("severity") == sev_level]
+                    if not sev_issues:
+                        continue
+                    sev_label = {"critical": "CRITICAL", "high": "HIGH", "medium": "MEDIUM", "low": "LOW"}
+                    lines.append(f"**{sev_label[sev_level]} Priority Issues:**")
+                    lines.append("")
+                    for issue in sev_issues:
+                        itype = issue.get("type", "page").upper()
+                        lines.append(f"**[{sev_label[sev_level]}:{itype}] {issue['issue']}**")
+                        if issue.get("found"):
+                            lines.append(f"- **Found:** {issue['found']}")
+                        if issue.get("expected"):
+                            lines.append(f"- **Expected:** {issue['expected']}")
+                        if issue.get("fix"):
+                            lines.append(f"- **How to fix:** {issue['fix']}")
+                        if issue.get("verify"):
+                            lines.append(f"- **Verify:** {issue['verify']}")
+                        lines.append("")
             else:
                 lines.append("**No issues found.**")
                 lines.append("")

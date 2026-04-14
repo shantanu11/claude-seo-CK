@@ -392,42 +392,99 @@ def analyze_page(url: str, mode: str = "page", timeout: int = 30) -> dict:
     s = seo_summary
 
     if not s["title"]:
-        issues.append({"severity": "critical", "type": "page", "issue": "Missing title tag"})
+        issues.append({"severity": "critical", "type": "page", "issue": "Missing title tag",
+                        "found": "No <title> tag", "expected": "50-60 chars with primary keyword",
+                        "fix": "Add a unique title tag with primary keyword in first 3 words",
+                        "verify": url})
     elif s["title_length"] < 20:
-        issues.append({"severity": "high", "type": "page", "issue": f"Title too short ({s['title_length']} chars)"})
+        issues.append({"severity": "high", "type": "page", "issue": f"Title too short ({s['title_length']} chars)",
+                        "found": f'"{s["title"]}" ({s["title_length"]} chars)', "expected": "50-60 chars",
+                        "fix": "Expand title with descriptive keywords",
+                        "verify": url})
     elif s["title_length"] > 60:
-        issues.append({"severity": "medium", "type": "page", "issue": f"Title too long ({s['title_length']} chars)"})
+        issues.append({"severity": "medium", "type": "page", "issue": f"Title too long ({s['title_length']} chars)",
+                        "found": f'"{s["title"]}" ({s["title_length"]} chars)', "expected": "Max 60 chars",
+                        "fix": "Trim title to 60 chars -- Google truncates longer titles in SERPs",
+                        "verify": url})
 
     if not s["meta_description"]:
-        issues.append({"severity": "high", "type": "page", "issue": "Missing meta description"})
+        issues.append({"severity": "high", "type": "page", "issue": "Missing meta description",
+                        "found": "No meta description tag", "expected": "120-160 chars with CTA",
+                        "fix": "Add <meta name='description' content='...'> with compelling summary",
+                        "verify": url})
     elif s["meta_description_length"] > 160:
-        issues.append({"severity": "medium", "type": "page", "issue": f"Meta description too long ({s['meta_description_length']} chars)"})
+        issues.append({"severity": "medium", "type": "page", "issue": f"Meta description too long ({s['meta_description_length']} chars)",
+                        "found": f'"{(s["meta_description"] or "")[:80]}..." ({s["meta_description_length"]} chars)',
+                        "expected": "Max 160 chars",
+                        "fix": "Trim to 155-160 chars to avoid SERP truncation",
+                        "verify": url})
 
     if s["h1_count"] == 0:
-        issues.append({"severity": "critical", "type": "page", "issue": "Missing H1 tag"})
+        issues.append({"severity": "critical", "type": "page", "issue": "Missing H1 tag",
+                        "found": "No H1 tag on page", "expected": "Exactly 1 H1 matching page intent",
+                        "fix": "Add a single H1 tag with the primary keyword",
+                        "verify": url})
     elif s["h1_count"] > 1:
-        issues.append({"severity": "medium", "type": "page", "issue": f"Multiple H1 tags ({s['h1_count']})"})
+        issues.append({"severity": "medium", "type": "page", "issue": f"Multiple H1 tags ({s['h1_count']})",
+                        "found": f'{s["h1_count"]} H1 tags: {", ".join(s["h1"][:3])}',
+                        "expected": "Exactly 1 H1",
+                        "fix": "Keep one H1, convert others to H2",
+                        "verify": url})
 
     if s["word_count"] < 100:
-        issues.append({"severity": "critical", "type": "page", "issue": f"Thin content ({s['word_count']} words)"})
+        issues.append({"severity": "critical", "type": "page", "issue": f"Thin content ({s['word_count']} words)",
+                        "found": f"{s['word_count']} words", "expected": "Min 300 words for blog, 100 for product",
+                        "fix": "Add substantial content -- thin pages risk being deindexed",
+                        "verify": url})
     elif s["word_count"] < 300:
-        issues.append({"severity": "high", "type": "page", "issue": f"Low word count ({s['word_count']} words)"})
+        issues.append({"severity": "high", "type": "page", "issue": f"Low word count ({s['word_count']} words)",
+                        "found": f"{s['word_count']} words", "expected": "300+ words minimum",
+                        "fix": "Expand content with relevant details, FAQs, or examples",
+                        "verify": url})
 
     if s["images_missing_alt"] > 0:
-        issues.append({"severity": "medium", "type": "page", "issue": f"{s['images_missing_alt']} image(s) missing alt"})
+        issues.append({"severity": "medium", "type": "page", "issue": f"{s['images_missing_alt']} image(s) missing alt text",
+                        "found": f"{s['images_missing_alt']} of {s['images_total']} images have no alt attribute",
+                        "expected": "All images should have descriptive alt text",
+                        "fix": "Add alt='descriptive text' to every <img> tag for accessibility + SEO",
+                        "verify": url})
 
     if not s["canonical"]:
-        issues.append({"severity": "medium", "type": "page", "issue": "Missing canonical tag"})
+        issues.append({"severity": "medium", "type": "page", "issue": "Missing canonical tag",
+                        "found": "No <link rel='canonical'> tag", "expected": "Self-referencing canonical",
+                        "fix": f"Add <link rel='canonical' href='{url}'>",
+                        "verify": url})
 
     if not s["schema_types"]:
-        issues.append({"severity": "low", "type": "page", "issue": "No structured data"})
+        issues.append({"severity": "low", "type": "page", "issue": "No structured data (JSON-LD)",
+                        "found": "No schema markup detected", "expected": "Article, Organization, or BreadcrumbList schema",
+                        "fix": "Add JSON-LD structured data for rich results eligibility",
+                        "verify": url})
 
     if s["internal_links"] == 0:
-        issues.append({"severity": "high", "type": "page", "issue": "No internal links (orphan page)"})
+        issues.append({"severity": "high", "type": "page", "issue": "No internal links (orphan page)",
+                        "found": "0 internal links", "expected": "3+ internal links to related pages",
+                        "fix": "Add contextual links to related pages to improve crawlability",
+                        "verify": url})
+
+    if not s["has_og"]:
+        issues.append({"severity": "low", "type": "page", "issue": "Missing Open Graph tags",
+                        "found": "No og:title, og:description, og:image", "expected": "Full OG tags for social sharing",
+                        "fix": "Add og:title, og:description, og:image meta tags",
+                        "verify": url})
+
+    if not s["has_twitter_card"]:
+        issues.append({"severity": "low", "type": "page", "issue": "Missing Twitter Card tags",
+                        "found": "No twitter:card meta tags", "expected": "twitter:card, twitter:title, twitter:description",
+                        "fix": "Add Twitter Card meta tags for better social previews",
+                        "verify": url})
 
     robots = s.get("meta_robots") or ""
     if "noindex" in robots.lower():
-        issues.append({"severity": "critical", "type": "page", "issue": "Page is noindex"})
+        issues.append({"severity": "critical", "type": "page", "issue": "Page is set to noindex",
+                        "found": f'meta robots="{robots}"', "expected": "index,follow (or no robots tag)",
+                        "fix": "Remove noindex unless intentional -- this page won't appear in search",
+                        "verify": url})
 
     # ── Content analysis ─────────────────────────────────────────────────
     if mode in ("content", "all"):
@@ -435,30 +492,66 @@ def analyze_page(url: str, mode: str = "page", timeout: int = 30) -> dict:
         result["content"] = content_data
 
         if content_data["readability_score"] < 30:
-            issues.append({"severity": "high", "type": "content", "issue": f"Very poor readability ({content_data['readability_score']})"})
+            issues.append({"severity": "high", "type": "content", "issue": f"Very poor readability (Flesch {content_data['readability_score']})",
+                            "found": f"Flesch Reading Ease: {content_data['readability_score']} ({content_data['reading_level']})",
+                            "expected": "Score 60+ for general audience",
+                            "fix": "Shorten sentences, use simpler words, break long paragraphs",
+                            "verify": url})
         elif content_data["readability_score"] < 50:
-            issues.append({"severity": "medium", "type": "content", "issue": f"Difficult readability ({content_data['readability_score']})"})
+            issues.append({"severity": "medium", "type": "content", "issue": f"Difficult readability (Flesch {content_data['readability_score']})",
+                            "found": f"Flesch Reading Ease: {content_data['readability_score']} ({content_data['reading_level']})",
+                            "expected": "Score 60+ for general audience",
+                            "fix": "Simplify sentence structure, avg sentence length is {:.0f} words".format(content_data['avg_sentence_length']),
+                            "verify": url})
 
         if not content_data["has_author"]:
-            issues.append({"severity": "high", "type": "content", "issue": "No author attribution (E-E-A-T)"})
+            issues.append({"severity": "high", "type": "content", "issue": "No author attribution (E-E-A-T)",
+                            "found": "No author name, byline, or meta author tag",
+                            "expected": "Author name with bio/credentials link",
+                            "fix": "Add visible author byline + Person schema for E-E-A-T signals",
+                            "verify": url})
 
         if not content_data["has_publish_date"]:
-            issues.append({"severity": "medium", "type": "content", "issue": "No publish date"})
+            issues.append({"severity": "medium", "type": "content", "issue": "No publish date",
+                            "found": "No article:published_time meta or <time> tag",
+                            "expected": "Visible publish date + datePublished in schema",
+                            "fix": "Add publish date with <time datetime='...'> and article:published_time meta",
+                            "verify": url})
 
         if not content_data["has_update_date"]:
-            issues.append({"severity": "low", "type": "content", "issue": "No last-updated date"})
+            issues.append({"severity": "low", "type": "content", "issue": "No last-updated date",
+                            "found": "No article:modified_time meta tag",
+                            "expected": "Last-updated date for freshness signals",
+                            "fix": "Add 'Last updated: Month Year' + article:modified_time meta",
+                            "verify": url})
 
         if content_data["external_citation_count"] == 0:
-            issues.append({"severity": "medium", "type": "content", "issue": "No external citations/sources"})
+            issues.append({"severity": "medium", "type": "content", "issue": "No external citations/sources",
+                            "found": "0 external links to authoritative sources",
+                            "expected": "2+ citations to studies, official docs, or data sources",
+                            "fix": "Link to authoritative sources to build trust and E-E-A-T",
+                            "verify": url})
 
         if content_data["content_to_html_ratio"] < 10:
-            issues.append({"severity": "high", "type": "content", "issue": f"Low content-to-HTML ratio ({content_data['content_to_html_ratio']}%)"})
+            issues.append({"severity": "high", "type": "content", "issue": f"Low content-to-HTML ratio ({content_data['content_to_html_ratio']}%)",
+                            "found": f"{content_data['content_to_html_ratio']}% content vs HTML",
+                            "expected": "15%+ content-to-HTML ratio",
+                            "fix": "Reduce boilerplate HTML, add more visible text content",
+                            "verify": url})
 
         if content_data["paragraph_count"] < 3:
-            issues.append({"severity": "medium", "type": "content", "issue": f"Very few paragraphs ({content_data['paragraph_count']})"})
+            issues.append({"severity": "medium", "type": "content", "issue": f"Very few paragraphs ({content_data['paragraph_count']})",
+                            "found": f"{content_data['paragraph_count']} <p> tags",
+                            "expected": "10+ paragraphs for substantive content",
+                            "fix": "Break content into well-structured paragraphs (2-4 sentences each)",
+                            "verify": url})
 
         if content_data["avg_sentence_length"] > 30:
-            issues.append({"severity": "medium", "type": "content", "issue": f"Long avg sentence length ({content_data['avg_sentence_length']} words)"})
+            issues.append({"severity": "medium", "type": "content", "issue": f"Long avg sentence length ({content_data['avg_sentence_length']} words)",
+                            "found": f"Average {content_data['avg_sentence_length']} words per sentence",
+                            "expected": "15-20 words per sentence",
+                            "fix": "Break long sentences into shorter ones for better readability",
+                            "verify": url})
 
     # ── GEO analysis ─────────────────────────────────────────────────────
     if mode in ("geo", "all"):
@@ -466,24 +559,52 @@ def analyze_page(url: str, mode: str = "page", timeout: int = 30) -> dict:
         result["geo"] = geo_data
 
         if geo_data["citability_score"] < 30:
-            issues.append({"severity": "high", "type": "geo", "issue": f"Very low AI citability ({geo_data['citability_score']}/100)"})
+            issues.append({"severity": "high", "type": "geo", "issue": f"Very low AI citability ({geo_data['citability_score']}/100)",
+                            "found": f"Citability score: {geo_data['citability_score']}/100",
+                            "expected": "60+ for AI citation readiness",
+                            "fix": "Add answer-first paragraphs, Q&A format, stats with sources",
+                            "verify": url})
         elif geo_data["citability_score"] < 50:
-            issues.append({"severity": "medium", "type": "geo", "issue": f"Low AI citability ({geo_data['citability_score']}/100)"})
+            issues.append({"severity": "medium", "type": "geo", "issue": f"Low AI citability ({geo_data['citability_score']}/100)",
+                            "found": f"Citability score: {geo_data['citability_score']}/100",
+                            "expected": "60+ for AI citation readiness",
+                            "fix": "Improve passage structure, add self-contained 134-167 word answer blocks",
+                            "verify": url})
 
         if not geo_data["has_answer_first"]:
-            issues.append({"severity": "medium", "type": "geo", "issue": "No answer-first format after H1"})
+            issues.append({"severity": "medium", "type": "geo", "issue": "No answer-first format after H1",
+                            "found": "First paragraph after H1 doesn't directly answer a query",
+                            "expected": "Direct 40-60 word answer immediately after H1",
+                            "fix": "Add a concise definition or answer in the first paragraph after H1",
+                            "verify": url})
 
         if geo_data["entity_clarity"] == "low":
-            issues.append({"severity": "high", "type": "geo", "issue": "Low entity clarity (title/H1 mismatch)"})
+            issues.append({"severity": "high", "type": "geo", "issue": "Low entity clarity (title/H1 mismatch)",
+                            "found": f'Title: "{s.get("title", "")}" vs H1: "{", ".join(s.get("h1", []))}"',
+                            "expected": "Title and H1 should share 2+ key terms",
+                            "fix": "Align title and H1 to clearly name the same entity/topic",
+                            "verify": url})
 
         if geo_data["citable_passages"] < 3:
-            issues.append({"severity": "medium", "type": "geo", "issue": f"Few citable passages ({geo_data['citable_passages']})"})
+            issues.append({"severity": "medium", "type": "geo", "issue": f"Few citable passages ({geo_data['citable_passages']})",
+                            "found": f"{geo_data['citable_passages']} of {geo_data['passage_count']} paragraphs are 30-200 words",
+                            "expected": "5+ self-contained passages that AI can quote",
+                            "fix": "Rewrite paragraphs to be 134-167 words, self-contained with specific facts",
+                            "verify": url})
 
         if not geo_data["has_structured_lists"]:
-            issues.append({"severity": "low", "type": "geo", "issue": "No structured lists for AI parsing"})
+            issues.append({"severity": "low", "type": "geo", "issue": "No structured lists for AI parsing",
+                            "found": "No <ul> or <ol> lists found",
+                            "expected": "2+ lists for step-by-step or multi-item content",
+                            "fix": "Convert bullet points or steps into proper HTML lists",
+                            "verify": url})
 
         if geo_data["stat_claims_count"] == 0:
-            issues.append({"severity": "low", "type": "geo", "issue": "No statistics/data points"})
+            issues.append({"severity": "low", "type": "geo", "issue": "No statistics or data points",
+                            "found": "No numbers, percentages, or data claims detected",
+                            "expected": "3+ specific stats with source attribution",
+                            "fix": "Add specific data points (e.g., prices, percentages, counts) with sources",
+                            "verify": url})
 
     result["issues"] = issues
 
