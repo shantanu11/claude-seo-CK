@@ -69,8 +69,8 @@ claude
 
 | Command | Description |
 |---------|-------------|
-| `/seo audit <url>` | Full website audit with parallel subagent delegation |
-| `/seo page <url(s)>` | Page analysis -- 1 URL (detailed) or multiple URLs (auto batch with page/content/geo modes) |
+| `/seo audit <url>` | Full website audit -- 15-section report with evidence, sample URLs, 30-day roadmap |
+| `/seo page <url(s)>` | Page analysis -- 1 URL (12-section deep dive) or multiple URLs (auto batch scan) |
 | `/seo sitemap <url>` | Analyze existing XML sitemap |
 | `/seo sitemap generate` | Generate new sitemap with industry templates |
 | `/seo schema <url>` | Detect, validate, and generate Schema.org markup |
@@ -226,69 +226,93 @@ Generate professional reports after any analysis:
 | **XLSX** | Excel workbook with filterable data sheets | `openpyxl` |
 | **HTML** | Standalone HTML file | (built-in) |
 
-### Batch Page/Content/GEO Analysis (50+ URLs)
+### Audit Report (15 sections)
 
-Analyze multiple pages at once with four modes:
+`/seo audit` produces a comprehensive report with:
+
+| # | Section | What's included |
+|---|---------|----------------|
+| 1 | Header | Domain, platform, business type, location, verification statement |
+| 2 | Health Score Table | 7 categories with scores, weights, weighted contribution |
+| 3 | Executive Summary | What's strong, what's broken, 30-day target score |
+| 4 | What's Working Well | Table of things to preserve during fixes |
+| 5 | Issues by Priority | Evidence + sample URLs + time estimates + platform-specific fixes |
+| 6 | Performance Estimates | LCP, INP, CLS, third-party JS payload |
+| 7 | Content Quality | Per-page: words, schema, E-E-A-T, verdict |
+| 8 | Sitemap & Crawlability | robots.txt, sitemap, AI crawler directives |
+| 9 | 30-Day Roadmap | 4 phases with tasks, time estimates, score projection |
+| 10 | Security Headers | Per-header: found vs recommended |
+| 11 | Schema Validation | Per JSON-LD block: exact field errors with actual vs expected |
+| 12 | Third-Party Scripts | Name, size, load point, keep/defer/remove recommendation |
+| 13 | Internal Linking | Orphan pages, most linked, dead ends |
+| 14 | Mobile Usability | Viewport, font sizes, tap targets |
+| 15 | Footer | Methodology and verification date |
+
+Every issue includes: **Found** (exact value from live HTML), **Expected**, **How to fix** (platform-specific), **Time estimate**, **Sample URL** for verification.
+
+### Page Report (12 sections)
+
+`/seo page <url>` single-URL deep dive:
+
+| # | Section | What's included |
+|---|---------|----------------|
+| 1 | Header | URL, date, page type, platform, HTTP status |
+| 2 | Score Card | 6 categories with scores |
+| 3 | On-Page SEO | Exact title, meta desc, H1, H2s, canonical, links, word count |
+| 4 | Content & E-E-A-T | Readability, author, dates, citations, content-to-HTML ratio |
+| 5 | Schema Audit | Per JSON-LD block validation with specific field issues |
+| 6 | Image Audit | Missing alt with src + suggested alt text |
+| 7 | Technical Meta | OG, Twitter Card, hreflang -- exact values found |
+| 8 | Performance Signals | Preloads, render-blocking scripts, third-party inventory |
+| 9 | AI Citation (GEO) | Citability, Q&A, answer-first, entity clarity, citable passages |
+| 10 | Issues with Evidence | Found/Expected/Fix/Time/Verify URL for each issue |
+| 11 | Recommendations | Prioritized table with time and impact estimates |
+| 12 | Schema Suggestions | Ready-to-use JSON-LD code to copy-paste |
+
+### Multi-URL Scan (50+ URLs)
+
+`/seo page url1, url2, url3...` auto-detects batch mode:
 
 ```bash
-# On-page SEO (title, meta, headings, links, schema)
-/seo page-batch --urls "url1,url2,url3..." --mode page
-
-# Content / E-E-A-T (readability, author, dates, citations)
-/seo page-batch --batch urls.txt --mode content --workers 5
-
-# GEO / AI citation readiness (citability, Q&A, answer-first)
-/seo page-batch --batch urls.txt --mode geo --workers 5
-
-# Everything combined
-/seo page-batch --batch urls.txt --mode all --workers 5
+/seo page url1, url2, url3, url4, url5         # comma-separated
+/seo page --batch urls.txt --mode all           # from file
+/seo page --batch urls.txt --mode content       # content only
 ```
 
-Auto-saves results with domain-based filename and prints the exact report command:
+Modes: `page` (on-page SEO), `content` (E-E-A-T), `geo` (AI citation), `all` (default).
+Auto-saves with domain-based filename. Prints exact DOCX report command.
 
-```
-Results saved to: seo-batch-cashkaro.com-all-20260414-1545.json
-Generate DOCX report: /seo report --input seo-batch-cashkaro.com-all-20260414-1545.json --format docx
-```
+**Workflow:** Scan 50 URLs to find weakest pages, then deep-dive the worst ones individually.
 
 ### Batch URL Inspection (50+ URLs)
 
-Inspect indexation status for large URL lists:
-
 ```bash
 /seo google inspect-batch urls.txt --workers 5
-/seo google inspect-urls "https://a.com/1,https://a.com/2,..."
+/seo google inspect-urls "url1,url2,url3..."
 ```
 
-Features: shared service object, 1-10 concurrent workers, progress with ETA, incremental JSON save. Limit: 2,000 URLs/day per site.
+Concurrent workers, progress with ETA, incremental JSON save. Limit: 2,000 URLs/day.
 
 ### Universal Report Generator
 
-Convert any analysis output to a shareable DOCX or PDF -- no re-analysis needed:
+Convert any analysis output to shareable DOCX/PDF -- no re-analysis:
 
 ```bash
-# From batch analysis JSON
-/seo report --input seo-batch-cashkaro.com-all-20260414-1545.json --format docx
-
-# From audit markdown
-/seo report --input FULL-AUDIT-REPORT.md --input ACTION-PLAN.md --format docx
-
-# Auto-find all reports in current directory
+/seo report --input FULL-AUDIT-REPORT.md --format docx
+/seo report --input batch-results.json --format docx
 /seo report --dir ./ --format both
 ```
 
-Accepts: `.md` reports from any `/seo` command, `.json` from `page-batch` or Google APIs.
-Outputs: Professional DOCX (branded tables, headings) or PDF (styled HTML).
-
 ### Recently Added
-- **Batch page/content/geo analysis** -- `/seo page-batch` with `--mode page|content|geo|all` for 50+ URLs
-- **Universal report generator** -- `/seo report` converts any analysis output to shareable DOCX/PDF
-- **DOCX report format** -- Word document output for all report types (`--format docx`)
-- **Batch URL Inspection enhancements** -- `--urls` direct input, `--workers` concurrency, progress tracking
+- **Comprehensive audit template** -- 15 mandatory sections with evidence, sample URLs, 30-day roadmap
+- **Comprehensive page template** -- 12 mandatory sections with schema JSON-LD suggestions
+- **Multi-URL auto-detection** -- `/seo page` handles 1 or 50 URLs automatically
+- **Universal report generator** -- `/seo report` converts any output to DOCX/PDF
+- **Batch URL Inspection** -- `--urls` direct input, `--workers` concurrency, progress tracking
+- **DOCX report format** -- Word document output for all report types
 - Programmatic SEO skill (`/seo programmatic`)
 - Competitor comparison pages skill (`/seo competitor-pages`)
 - Multi-language hreflang validation (`/seo hreflang`)
-- Video & Live schema types (VideoObject, BroadcastEvent, Clip, SeekToAction)
 
 ## Requirements
 
