@@ -12,26 +12,36 @@ metadata:
 
 # Full Website SEO Audit
 
+## Progress Updates (MANDATORY)
+
+Print a status update to the user at each step so they can track progress. Use this exact format:
+
+```
+--- AUDIT PROGRESS: eduvouchers.com ---
+[1/8] Fetching homepage...                    DONE
+[2/8] Detecting business type...              E-commerce (Shopify)
+[3/8] Fetching robots.txt, sitemap, llms.txt... DONE (545 URLs in sitemap)
+[4/8] Checking security headers...            DONE (2 missing)
+[5/8] Analyzing key pages (home, about, product, blog, collection)... RUNNING
+[6/8] Inspecting JSON-LD schema blocks...     PENDING
+[7/8] Compiling scores...                     PENDING
+[8/8] Generating report...                    PENDING
+```
+
+Update this block each time a step completes. The user should never wonder "is it still running?" or "what's happening?"
+
 ## Process
 
-1. **Fetch homepage**: use `scripts/fetch_page.py` to retrieve HTML
-2. **Detect business type**: analyze homepage signals per seo orchestrator
-3. **Crawl site**: follow internal links up to 500 pages, respect robots.txt
-4. **Inspect deeply**: read actual HTML source, JSON-LD blocks, robots.txt, sitemap.xml, HTTP headers, third-party scripts. Do NOT guess -- verify from live data.
-5. **Delegate to subagents** (if available, otherwise run inline sequentially):
-   - `seo-technical` -- robots.txt, sitemaps, canonicals, Core Web Vitals, security headers
-   - `seo-content` -- E-E-A-T, readability, thin content, AI citation readiness
-   - `seo-schema` -- detection, validation, generation recommendations
-   - `seo-sitemap` -- structure analysis, quality gates, missing pages
-   - `seo-performance` -- LCP, INP, CLS measurements
-   - `seo-visual` -- screenshots, mobile testing, above-fold analysis
-   - `seo-geo` -- AI crawler access, llms.txt, citability, brand mention signals
-   - `seo-local` -- GBP signals, NAP consistency, reviews, local schema (spawn when local business detected)
-   - `seo-maps` -- Geo-grid rank tracking, GBP audit, reviews, competitors (spawn when local + DataForSEO available)
-   - `seo-google` -- CWV field data (CrUX), URL indexation (GSC), organic traffic (GA4) (spawn when Google API credentials detected)
-   - `seo-backlinks` -- Backlink profile data (spawn when Moz/Bing API keys detected)
-6. **Score** -- aggregate into SEO Health Score (0-100)
-7. **Report** -- generate comprehensive report in the MANDATORY format below
+1. **Fetch homepage + robots.txt + sitemap + llms.txt + security headers** -- run ALL in parallel using multiple Bash calls in one message. Print progress after.
+2. **Detect business type** from homepage HTML signals.
+3. **Parse homepage HTML deeply** -- read JSON-LD blocks, meta tags, scripts in head, images. Print what was found.
+4. **Fetch and analyze key pages** -- use `page_batch.py --mode all` on 5-8 representative pages (homepage, about, a product, a blog post, FAQ, collection). Print scores.
+5. **Inspect JSON-LD schema** on each page type -- read the actual blocks, validate fields, compare values. Print findings.
+6. **Compile scores** across all 7 categories.
+7. **Generate the 15-section report** in the MANDATORY format below.
+8. **Save report** and print the exact DOCX command.
+
+At each step, update the progress block so the user sees live status.
 
 ## Crawl Configuration
 
