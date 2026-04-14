@@ -237,6 +237,18 @@ Generate `GEO-ANALYSIS.md` with:
 4. Implement comprehensive entity linking (sameAs across platforms)
 5. Develop unique tools or calculators
 
+## Issue Reporting Format (MANDATORY)
+
+Every issue in the GEO analysis MUST use this format. No exceptions.
+
+**[SEVERITY:GEO] Issue title**
+- **Found:** What was actually detected (quote exact value or state)
+- **Expected:** What the standard or best practice requires
+- **How to fix:** Specific actionable instruction
+- **Verify:** The exact URL where the team can click and confirm the fix
+
+Apply this in GEO-ANALYSIS.md and all inline output.
+
 ## DataForSEO Integration (Optional)
 
 If DataForSEO MCP tools are available, use `ai_optimization_chat_gpt_scraper` to check what ChatGPT web search returns for target queries (real GEO visibility check) and `ai_opt_llm_ment_search` with `ai_opt_llm_ment_top_domains` for LLM mention tracking across AI platforms.

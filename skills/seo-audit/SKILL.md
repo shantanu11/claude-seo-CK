@@ -49,6 +49,7 @@ Delay between requests: 1 second
 - `ACTION-PLAN.md`: Prioritized recommendations (Critical > High > Medium > Low)
 - `screenshots/`: Desktop + mobile captures (if Playwright available)
 - **PDF Report** (recommended): Generate a professional A4 PDF using `scripts/google_report.py --type full`. This produces a white-cover enterprise report with TOC, executive summary, charts (Lighthouse gauges, query bars, index donut), metric cards, threshold tables, prioritized recommendations with effort estimates, and implementation roadmap. Always offer PDF generation after completing an audit.
+- **DOCX Report**: Generate a Word document using `scripts/google_report.py --type full --format docx`. Professional layout with branded styles, embedded charts, formatted tables, and prioritized recommendations. Useful for stakeholder sharing and editing. Requires `python-docx` (`pip install python-docx`).
 
 ## Scoring Weights
 
@@ -114,6 +115,47 @@ Delay between requests: 1 second
 - **High**: Significantly impacts rankings (fix within 1 week)
 - **Medium**: Optimization opportunity (fix within 1 month)
 - **Low**: Nice to have (backlog)
+
+## Issue Reporting Format (MANDATORY)
+
+Every issue in the audit MUST use this format. No exceptions.
+
+**[SEVERITY:CATEGORY] Issue title**
+- **Found:** What was actually detected (quote exact value, count, or state)
+- **Expected:** What the standard or best practice requires
+- **How to fix:** Specific actionable instruction
+- **Verify:** The exact URL where the team can click and confirm the fix
+
+Apply this in FULL-AUDIT-REPORT.md, ACTION-PLAN.md, and all inline output.
+
+## Issue Reporting Format (MANDATORY)
+
+Every issue reported in the audit MUST include all four fields. No exceptions.
+
+```
+**[SEVERITY:CATEGORY] Issue title**
+- **Found:** What was actually detected (quote the exact value, count, or state)
+- **Expected:** What the standard or best practice requires
+- **How to fix:** Specific, actionable instruction (not vague advice)
+- **Verify:** The exact URL where the team can click and confirm the fix was applied
+```
+
+Example:
+```
+**[HIGH:PAGE] Missing meta description**
+- **Found:** No <meta name="description"> tag on page
+- **Expected:** 120-160 chars with compelling summary and primary keyword
+- **How to fix:** Add <meta name="description" content="..."> in the <head>
+- **Verify:** https://example.com/blog/my-post
+```
+
+This format ensures:
+1. The team knows exactly what's wrong (Found)
+2. They know the target (Expected)
+3. They know what to do (How to fix)
+4. They can click to validate after fixing (Verify)
+
+Apply this format in FULL-AUDIT-REPORT.md, ACTION-PLAN.md, and all inline output.
 
 ## DataForSEO Integration (Optional)
 

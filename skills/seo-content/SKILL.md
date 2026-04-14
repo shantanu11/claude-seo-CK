@@ -160,7 +160,16 @@ GEO is the emerging discipline of optimizing content specifically for AI-generat
 
 ### AI Citation Readiness: XX/100
 
-### Issues Found
+### Issues Found (MANDATORY FORMAT)
+
+Every issue MUST use this format:
+
+**[SEVERITY:CONTENT] Issue title**
+- **Found:** What was actually detected (quote exact value or state)
+- **Expected:** What the standard or best practice requires
+- **How to fix:** Specific actionable instruction
+- **Verify:** The exact URL where the team can click and confirm the fix
+
 ### Recommendations
 
 ## DataForSEO Integration (Optional)
