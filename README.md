@@ -70,7 +70,7 @@ claude
 | Command | Description |
 |---------|-------------|
 | `/seo audit <url>` | Full website audit with parallel subagent delegation |
-| `/seo page <url>` | Deep single-page analysis |
+| `/seo page <url(s)>` | Page analysis -- 1 URL (detailed) or multiple URLs (auto batch with page/content/geo modes) |
 | `/seo sitemap <url>` | Analyze existing XML sitemap |
 | `/seo sitemap generate` | Generate new sitemap with industry templates |
 | `/seo schema <url>` | Detect, validate, and generate Schema.org markup |
@@ -87,7 +87,6 @@ claude
 | `/seo google [command] [url]` | Google SEO APIs (GSC, PageSpeed, CrUX, Indexing, GA4) |
 | `/seo google report [type]` | Generate PDF/DOCX/XLSX report with charts (cwv-audit, gsc-performance, indexation, full) |
 | `/seo google inspect-urls <urls>` | Batch URL Inspection from comma-separated list (50+ URLs, concurrent workers) |
-| `/seo page-batch <urls or file>` | Batch page/content/geo analysis for 50+ URLs with concurrent workers |
 | `/seo report --input <file>` | Convert any analysis output (md/json) to shareable DOCX/PDF |
 | `/seo backlinks <url>` | Backlink profile analysis (free: Moz, Bing, Common Crawl) |
 | `/seo firecrawl [command] <url>` | Full-site crawling and site mapping (extension) |

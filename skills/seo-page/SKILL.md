@@ -1,20 +1,51 @@
 ---
 name: seo-page
 description: >
-  Deep single-page SEO analysis covering on-page elements, content quality,
-  technical meta tags, schema, images, and performance. Use when user says
-  "analyze this page", "check page SEO", "single URL", "check this page",
-  "page analysis", or provides a single URL for review.
+  Page SEO analysis -- handles single URL or multiple URLs automatically.
+  Covers on-page elements, content quality (E-E-A-T), AI citation readiness (GEO),
+  technical meta tags, schema, images, and performance.
+  Use when user says "analyze this page", "check page SEO", "page analysis",
+  or provides one or more URLs. Supports --mode page|content|geo|all.
 user-invokable: true
-argument-hint: "[url]"
+argument-hint: "<url(s)> [--mode page|content|geo|all]"
 license: MIT
 metadata:
   author: shantanu11
-  version: "1.8.2"
+  version: "1.9.0"
   category: seo
 ---
 
-# Single Page Analysis
+# Page Analysis
+
+## Auto-Detection
+
+This skill handles both single and multiple URLs:
+
+- **1 URL** → deep inline analysis (original seo-page behavior)
+- **2+ URLs** (comma-separated, space-separated, or file) → automatic batch mode via `scripts/page_batch.py`
+
+**How to detect:** Count URLs in the arguments. If there are commas, spaces between `http` strings, or a `--batch` flag, route to batch mode.
+
+### Single URL
+```
+/seo page https://example.com/blog/post
+```
+Runs the full inline analysis below (detailed scorecard, recommendations, schema suggestions).
+
+### Multiple URLs
+```
+/seo page https://example.com/blog/post1, https://example.com/blog/post2, https://example.com/blog/post3
+/seo page --batch urls.txt
+/seo page --batch urls.txt --mode all --workers 5
+```
+Runs `python scripts/page_batch.py --urls "url1,url2,..." --mode all` automatically.
+Default mode for multi-URL is `all` (page + content + geo).
+
+### Mode Options (multi-URL only)
+- `--mode page` -- on-page SEO only (title, meta, headings, links, schema)
+- `--mode content` -- + E-E-A-T (readability, author, dates, citations)
+- `--mode geo` -- + AI citation readiness (citability, Q&A, answer-first)
+- `--mode all` -- everything combined (default for multi-URL)
 
 ## What to Analyze
 
